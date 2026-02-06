@@ -66,7 +66,7 @@ app.post('/api/sticky/new-order', async (req, res) => {
 
         const response = await axios.post(
             `${process.env.STICKY_API_URL}/new_order`,
-            orderData,
+            new URLSearchParams(orderData).toString(),
             {
                 auth: {
                     username: process.env.STICKY_API_USERNAME,
