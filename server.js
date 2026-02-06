@@ -64,8 +64,11 @@ app.post('/api/sticky/new-order', async (req, res) => {
             [process.env.STICKY_TOKEN_FIELD || 'payment_token']: payment_token
         };
 
+        const stickyUrl = process.env.STICKY_API_URL.replace('/v2', '/v1'); // Ensure we use v1 for these field names
+        console.log(`🔗 Calling Sticky.io API (${stickyUrl}/new_order)...`);
+
         const response = await axios.post(
-            `${process.env.STICKY_API_URL}/new_order`,
+            `${stickyUrl}/new_order`,
             new URLSearchParams(orderData).toString(),
             {
                 auth: {
@@ -78,19 +81,37 @@ app.post('/api/sticky/new-order', async (req, res) => {
             }
         );
 
-        console.log('✅ Sticky order created:', response.data);
+        console.log('📦 Sticky.io Raw Response:', response.data);
 
-        res.json({
-            success: true,
-            order_id: response.data.order_id,
-            data: response.data
-        });
+        // Sticky v1 returns success info in the body, check response_code
+        // 100 is typically success in Sticky.io
+        const isSuccess = response.data.response_code === '100' || response.data.status === 'SUCCESS';
+
+        if (isSuccess) {
+            console.log('✅ Sticky order created successfully:', response.data.order_id);
+            res.json({
+                success: true,
+                order_id: response.data.order_id,
+                transaction_id: response.data.transaction_id,
+                data: response.data
+            });
+        } else {
+            console.warn('⚠️ Sticky.io declined/errored:', response.data.error_message || response.data.message);
+            res.json({
+                success: false,
+                order_id: response.data.order_id,
+                message: response.data.error_message || response.data.message || 'Payment declined',
+                response_code: response.data.response_code,
+                data: response.data
+            });
+        }
 
     } catch (error) {
-        console.error('❌ Sticky order error:', error.response?.data || error.message);
+        const errorData = error.response?.data || error.message;
+        console.error('❌ Sticky API fatal error:', errorData);
         res.status(500).json({
             success: false,
-            error: error.response?.data || error.message,
+            error: errorData,
             details: error.response?.status ? `HTTP ${error.response.status}` : 'Network error'
         });
     }
