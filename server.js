@@ -10,6 +10,19 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('dist'));
 
+// Get Railway's outbound IP
+app.get('/api/get-ip', async (req, res) => {
+    try {
+        const response = await axios.get('https://api.ipify.org?format=json');
+        res.json({
+            ip: response.data.ip,
+            message: 'This is the IP that Sticky.io sees from Railway'
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Get Sticky config
 app.get('/api/sticky/config', (req, res) => {
     res.json({
@@ -77,7 +90,8 @@ app.post('/api/sticky/new-order', async (req, res) => {
         console.error('❌ Sticky order error:', error.response?.data || error.message);
         res.status(500).json({
             success: false,
-            error: error.response?.data || error.message
+            error: error.response?.data || error.message,
+            details: error.response?.status ? `HTTP ${error.response.status}` : 'Network error'
         });
     }
 });
