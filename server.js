@@ -40,13 +40,18 @@ app.post('/api/sticky/new-order', async (req, res) => {
             last_name,
             email,
             phone,
+            address1,
+            city,
+            state,
+            zip_code,
             country
         } = req.body;
 
         console.log('Creating Sticky order with:', {
             payment_token: payment_token?.substring(0, 20) + '...',
             product_id,
-            email
+            email,
+            country
         });
 
         const orderData = {
@@ -60,6 +65,10 @@ app.post('/api/sticky/new-order', async (req, res) => {
             lastName: last_name,
             emailAddress: email,
             phoneNumber: phone,
+            address1: address1 || '123 Main St',
+            city: city || 'New York',
+            state: state || 'NY',
+            zipCode: zip_code || '10001',
             country: country || 'US',
             [process.env.STICKY_TOKEN_FIELD || 'payment_token']: payment_token
         };
