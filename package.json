@@ -1,0 +1,11 @@
+{
+    "name": "sticky-test-railway",
+    "version": "1.0.0",
+    "description": "Simple Sticky.io SDK test for Railway deployment",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2"
+    }
+}
