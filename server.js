@@ -55,20 +55,20 @@ app.post('/api/sticky/new-order', async (req, res) => {
         });
 
         const orderData = {
-            campaignId: 1,
-            offerId: 1,
-            billingModelId: 2,
-            shippingId: 2,
+            campaign_id: 1,
+            offer_id: 1,
+            billing_model_id: 2,
+            shipping_id: 2,
             product1_id: product_id || 1,
             product1_qty: 1,
-            firstName: first_name,
-            lastName: last_name,
-            emailAddress: email,
-            phoneNumber: phone,
+            first_name: first_name,
+            last_name: last_name,
+            email: email,
+            phone: phone,
             address1: address1 || '123 Main St',
             city: city || 'New York',
             state: state || 'NY',
-            zipCode: zip_code || '10001',
+            zip: zip_code || '10001',
             country: country || 'US',
             [process.env.STICKY_TOKEN_FIELD || 'payment_token']: payment_token
         };
